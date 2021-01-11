@@ -11,10 +11,10 @@ This application requires/utilizes the following infrastructure.
 4. Docker Hub registry to store the docker app image
 5. AWS EKS cluster
 
-# Amazon Elastic Kubernetes Service (Amazon EKS) has been created using below command:
-eksctl create cluster --name capstone --version 1.17 --nodegroup-name standard-workers --node-type t2.micro --nodes 3 --nodes-min 1 --nodes-max 4 --node-ami auto --region us-west-2
+### Amazon Elastic Kubernetes Service (Amazon EKS) has been created using below command:
+<i>eksctl create cluster --name capstone --version 1.17 --nodegroup-name standard-workers --node-type t2.micro --nodes 3 --nodes-min 1 --nodes-max 4 --node-ami auto --region us-west-2</i>
 
-** AWS EC2 instance was provisioned manually for Jenkins and Docker setup
+** AWS EC2 instance was provisioned manually for Jenkins and Docker setup<br>
 ** AWS EKS internally uses CloudFormation and setup the entire infrastructure automatically 
 
 ## Deployment - Jenkins Pipeline Build and Deployment Steps - Rolling Update
@@ -27,7 +27,7 @@ eksctl create cluster --name capstone --version 1.17 --nodegroup-name standard-w
 ** the file 'eks-deploy.yml' specifies teh deployment strategy as RollingUpdate
 
 ## Screen shots 
-# Rolling Update (/rolling/screenshots)
+### Rolling Update (/rolling/screenshots)
 1. app.jpg - screenshot of the final web-app.
 2. eks_cluster.jpg - AWS-EKS Cluster
 3. lint_failed.jpg - Jenkins pipeline Linting stage failed.
