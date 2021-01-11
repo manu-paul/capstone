@@ -1,0 +1,38 @@
+{
+   "kind":"ReplicationController",
+   "apiVersion":"v1",
+   "metadata":{
+      "name":"capstone-blue",
+      "labels":{
+         "app":"capstone-blue"
+      }
+   },
+   "spec":{
+      "replicas":1,
+      "selector":{
+         "app":"capstone-blue"
+      },
+      "template":{
+         "metadata":{
+            "labels":{
+               "app":"capstone-blue"
+            }
+         },
+         "spec":{
+            "containers":[
+               {
+                  "name":"capstone-blue",
+                  "image":"pmanu1977/capstone-blue:latest",
+                  "imagePullPolicy": "Always",
+                  "ports":[
+                     {
+                        "name":"http-server",
+                        "containerPort":80
+                     }
+                  ]
+               }
+            ]
+         }
+      }
+   }
+}

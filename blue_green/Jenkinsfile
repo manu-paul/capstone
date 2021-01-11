@@ -1,0 +1,66 @@
+pipeline {
+     agent any
+     stages {
+           stage('Lint HTML') {
+              steps {
+                  sh 'tidy -q -e **/*.html'
+              }
+         }        
+         stage('Build capstone-blue Docker Image') {
+              steps {
+                  sh 'docker build -t capstone-blue -f blue/Dockerfile .'
+              }
+         }
+         stage('Push capstone-blue Docker Image') {
+              steps {
+                  withDockerRegistry([url: "", credentialsId: "dockerhub"]) {
+                      sh "docker tag capstone-blue pmanu1977/capstone-blue"
+                      sh "docker push pmanu1977/capstone-blue"
+                  }
+              }
+         }
+        stage('Create the kubeconfig file') {
+            steps {
+                withAWS(region:'us-west-2', credentials:'capstone-aws-id') {
+                    sh '''
+                        aws eks --region us-west-2 update-kubeconfig --name capstone-blue
+                    '''
+                }
+            }
+        }
+         stage('Deploying capstone-blue') {
+              steps{
+                  echo 'Deploying to AWS...'
+                  withAWS(credentials: 'capstone-aws-id', region: 'us-west-2') {
+                      sh "aws eks --region us-west-2 update-kubeconfig --name capstone-blue"
+                      sh "kubectl config use-context arn:aws:eks:us-west-2:944378258408:cluster/capstone-blue"
+                      sh "kubectl apply -f ./blue/blue-cntrl.json"
+                      sh "kubectl get nodes"
+                      sh "kubectl get deployment"
+                      sh "kubectl get pod -o wide"
+                      //sh "kubectl get service/capstone"
+                  }
+              }
+        }
+        stage('Redirect service to capstone-blue') {
+            steps {
+				withAWS(region:'us-west-2', credentials:'capstone-aws-id') {
+					sh "kubectl apply -f ./blue-green-service.json"
+				}
+			}
+        }
+		stage('Get Services') {
+            steps {
+				withAWS(region:'us-west-2', credentials:'capstone-aws-id') {
+                    sh "kubectl get services"
+				}
+			}
+        }
+        stage("Cleaning up") {
+              steps{
+                    echo 'Cleaning up...'
+                    sh "docker system prune"
+              }
+        }
+     }
+}
